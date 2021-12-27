@@ -7,10 +7,16 @@ import {
     ParseIntPipe,
     Patch,
     Post,
+    UseGuards,
 } from '@nestjs/common';
 import { RoleService } from './role.service';
 import { ReadRoleDto, CreateRoleDto, UpdateRoleDto } from './dtos';
+import { AuthGuard } from '@nestjs/passport';
+import { RoleGuard } from './guards/role.guard';
+import { Roles } from './decorators/role.decorator';
+import { RoleType } from './roletype.enum';
 
+@UseGuards(AuthGuard(), RoleGuard)
 @Controller('roles')
 export class RoleController {
     constructor(private readonly _roleService: RoleService) {}
@@ -35,6 +41,7 @@ export class RoleController {
     }
 
     @Patch(':roleId')
+    @Roles(RoleType.ADMIN)
     updateRole(
         @Param('roleId', ParseIntPipe) roleId: number,
         @Body() role: Partial<UpdateRoleDto>,
@@ -43,6 +50,7 @@ export class RoleController {
     }
 
     @Delete(':roleId')
+    @Roles(RoleType.ADMIN)
     deleteRole(@Param('roleId', ParseIntPipe) roleId: number) {
         return this._roleService.delete(roleId);
     }

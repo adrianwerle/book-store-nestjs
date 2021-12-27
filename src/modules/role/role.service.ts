@@ -8,6 +8,7 @@ import { RoleRepository } from './role.repository';
 import { Role } from './role.entity';
 import { plainToClass } from 'class-transformer';
 import { ReadRoleDto, CreateRoleDto, UpdateRoleDto } from './dtos';
+import { status } from '../../shared/entity-status.enum';
 
 @Injectable()
 export class RoleService {
@@ -22,7 +23,7 @@ export class RoleService {
         }
 
         const role: Role = await this._roleRepository.findOne(id, {
-            where: { status: 'ACTIVE' },
+            where: { status: status.ACTIVE },
         });
 
         if (!role) {
@@ -34,7 +35,7 @@ export class RoleService {
 
     async getAll(): Promise<ReadRoleDto[]> {
         const roles: Role[] = await this._roleRepository.find({
-            where: { status: 'ACTIVE' },
+            where: { status: status.ACTIVE },
         });
 
         return roles.map((role: Role) => plainToClass(ReadRoleDto, role));
@@ -50,7 +51,7 @@ export class RoleService {
         role: Partial<UpdateRoleDto>,
     ): Promise<ReadRoleDto> {
         const foundRole = await this._roleRepository.findOne(roleId, {
-            where: { status: 'ACTIVE' },
+            where: { status: status.ACTIVE },
         });
         if (!foundRole) {
             throw new NotFoundException('This role does not exist');
@@ -65,13 +66,13 @@ export class RoleService {
 
     async delete(id: number): Promise<void> {
         const roleExists = await this._roleRepository.findOne(id, {
-            where: { status: 'ACTIVE' },
+            where: { status: status.ACTIVE },
         });
 
         if (!roleExists) {
             throw new NotFoundException();
         }
 
-        await this._roleRepository.update(id, { status: 'INACTIVE' });
+        await this._roleRepository.update(id, { status: status.INACTIVE });
     }
 }

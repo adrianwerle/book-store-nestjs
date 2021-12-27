@@ -6,6 +6,7 @@ import { Role } from '../role/role.entity';
 import { RoleType } from '../role/roletype.enum';
 import { UserDetails } from '../user/user.details.entity';
 import { genSalt, hash } from 'bcryptjs';
+import { status } from '../../shared/entity-status.enum';
 
 @EntityRepository(User)
 export class AuthRepository extends Repository<User> {
@@ -18,11 +19,25 @@ export class AuthRepository extends Repository<User> {
         const roleRepository: RoleRepository =
             await getConnection().getRepository(Role);
 
-        const defaultRole: Role = await roleRepository.findOne({
-            where: { name: RoleType.GENERAL },
-        });
+        const rolesCount = await roleRepository.count();
 
-        user.roles = [defaultRole];
+        if (rolesCount > 0) {
+            const defaultRole: Role = await roleRepository.findOne({
+                where: { status: status.ACTIVE, name: RoleType.GENERAL },
+            });
+            user.roles = [defaultRole];
+        } else {
+            const newAdminRole: Partial<Role> = {
+                name: RoleType.ADMIN,
+                description: 'First Admin Role',
+                status: status.ACTIVE,
+            };
+            await roleRepository.save(newAdminRole);
+            const defaultRole: Role = await roleRepository.findOne({
+                where: { status: status.ACTIVE, name: RoleType.ADMIN },
+            });
+            user.roles = [defaultRole];
+        }
 
         const details = new UserDetails();
         user.details = details;

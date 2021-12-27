@@ -3,7 +3,6 @@ import {
     Column,
     CreateDateColumn,
     Entity,
-    JoinColumn,
     ManyToMany,
     PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -13,24 +12,23 @@ import { UpdateDateColumn } from 'typeorm';
 @Entity('roles')
 export class Role extends BaseEntity {
     @PrimaryGeneratedColumn('increment')
-    id: number;
+    public id: number;
 
     @Column({ type: 'varchar', length: 20, nullable: false })
-    name: string;
+    public name: string;
 
     @Column({ type: 'text', nullable: false })
-    description: string;
+    public description: string;
 
     @ManyToMany(() => User, (user) => user.roles)
-    @JoinColumn()
-    users: User[];
+    public users: User[];
 
     @Column({ type: 'varchar', default: 'ACTIVE', length: 8 })
-    status: string;
+    public status: string;
 
     @CreateDateColumn({ type: 'timestamp', name: 'created_at' })
-    createdAt: Date;
+    public createdAt: Date;
 
     @UpdateDateColumn({ type: 'timestamp', name: 'updated_at' })
-    updatedAt: Date;
+    public updatedAt: Date;
 }
