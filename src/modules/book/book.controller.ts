@@ -19,7 +19,7 @@ import { Roles } from '../role/decorators/role.decorator';
 import { GetUser } from '../auth/user.decorator';
 import { UpdateBookDto } from './dtos/update-book.dto';
 
-@UseGuards(AuthGuard(), RoleGuard)
+// @UseGuards(AuthGuard(), RoleGuard)
 @Controller('books')
 export class BookController {
     constructor(private readonly _bookService: BookService) {}

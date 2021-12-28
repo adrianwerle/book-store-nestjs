@@ -11,7 +11,7 @@ import { status } from '../../shared/entity-status.enum';
 import { ReadBookDto } from './dtos/read-book.dto';
 import { plainToClass } from 'class-transformer';
 import { Book } from './book.entity';
-import { In } from 'typeorm';
+import { getConnection, In } from 'typeorm';
 import { CreateBookDto } from './dtos/create-book.dto';
 import { User } from '../user/user.entity';
 import { Role } from '../role/role.entity';
@@ -56,10 +56,13 @@ export class BookService {
             throw new BadRequestException('authorId must be sent');
         }
 
-        const books: Book[] = await this._bookRepository.find({
-            relations: ['authors'],
-            where: { status: status.ACTIVE, id: In([authorId]) },
-        });
+        const books: Book[] = await getConnection()
+            .getRepository(Book)
+            .createQueryBuilder('books')
+            .innerJoin('books.authors', 'users')
+            .where('books.status = :status', { status: status.ACTIVE })
+            .andWhere('users.id = :userId', { userId: authorId })
+            .getMany();
 
         return books.map((book: Book) => plainToClass(ReadBookDto, book));
     }
