@@ -56,6 +56,16 @@ export class BookService {
             throw new BadRequestException('authorId must be sent');
         }
 
+        // const books: Book[] = await this._bookRepository.find({
+        //     // relations: ['authors'],
+        //     where: {
+        //         status: status.ACTIVE,
+        //         authors: {
+        //             users: { id: authorId },
+        //         },
+        //     },
+        // });
+
         const books: Book[] = await getConnection()
             .getRepository(Book)
             .createQueryBuilder('books')
